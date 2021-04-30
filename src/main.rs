@@ -1,16 +1,15 @@
 //use std::env;
 use std::process;
 use std::error::Error;
-use csv::ReaderBuilder;
 
 extern crate clap;
 use clap::{Arg, App, SubCommand};
 
 fn main() {
-    let matches = App::new("My Super Program")
-                          .version("1.0")
-                          .author("Kevin K. <kbknapp@gmail.com>")
-                          .about("Does awesome things")
+    let matches = App::new("bank2ledger")
+                          .version("0.1")
+                          .author("mkfd")
+                          .about("Convert bank csv to ledger format")
                           .arg(Arg::with_name("config")
                                .short("c")
                                .long("config")
@@ -63,24 +62,18 @@ fn main() {
 
     let filename = matches.value_of("INPUT").unwrap();
     println!("Using input file: {}", filename);
-    if let Err(err) = convert(filename.to_string()) {
+    if let Err(err) = run(filename.to_string()) {
         println!("error running example: {}", err);
         process::exit(1);
     }
     // more program logic goes here...
 }
 
-fn convert(filename: String) -> Result<(), Box<dyn Error>> {
-    // Build the CSV reader and iterate over each record.
-    let mut rdr = ReaderBuilder::new().from_path(filename)?;
+fn run(file_path: String) -> Result<(), Box<dyn Error>> {
+    let mut rdr = csv::Reader::from_path(file_path)?;
     for result in rdr.records() {
-        // The iterator yields Result<StringRecord, Error>, so we check the
-        // error here.
         let record = result?;
         println!("{:?}", record);
     }
     Ok(())
 }
-
-//fn parse_csv(transactions: StringRecordsIter<R>) -> 
-
