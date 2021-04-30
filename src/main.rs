@@ -4,6 +4,31 @@ use std::error::Error;
 
 extern crate clap;
 use clap::{Arg, App, SubCommand};
+use serde::Deserialize;
+
+#[derive(Debug, Deserialize)]
+struct Record {
+    #[serde(rename = "Date")]
+    date: String,
+    #[serde(rename = "Payee")]
+    payee: String,
+    #[serde(rename = "Account number")]
+    account_number: String,
+    #[serde(rename = "Transaction type")]
+    transaction_type: String,
+    #[serde(rename = "Payment reference")]
+    payment_reference: String,
+    #[serde(rename = "Category")]
+    category: String,
+    #[serde(rename = "Amount (EUR)")]
+    amount: Option<f64>,
+    #[serde(rename = "Amount (Foreign Currency)")]
+    foreign_currency: Option<f64>,
+    #[serde(rename = "Type Foreign Currency")]
+    type_foreign_crrency: String,
+    #[serde(rename = "Exchange Rate")]
+    exchange_rate: String,
+}
 
 fn main() {
     let matches = App::new("bank2ledger")
@@ -71,8 +96,8 @@ fn main() {
 
 fn run(file_path: String) -> Result<(), Box<dyn Error>> {
     let mut rdr = csv::Reader::from_path(file_path)?;
-    for result in rdr.records() {
-        let record = result?;
+    for result in rdr.deserialize() {
+        let record: Record = result?;
         println!("{:?}", record);
     }
     Ok(())
